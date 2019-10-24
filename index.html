@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="author" content="Prince Chibuzor">
+    <meta http-equiv="X-UA-Compatibile" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>CRUD Application Using Vue.js, PHP & MySQLi</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://kit.fontawesome.com/50ecfb709f.js" crossorigin="anonymous"></script>
+   
+     
+<style type="text/css">
+#overlay{
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.6);
+}
+
+</style>
+
+
+
+</head>
+<body>
+    <div id="app">
+        <div class="container-fluid">
+            <div class="row bg-dark">
+                <div class="col-lg-12">
+                    <p class="text-center text-light display-4 pt-2" style="font-size: 25px;">CRUD Application Using Vue.js, PHP & MySQLi </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row mt-3">
+               <div class="col-lg-6">
+                <h3 class="text-info">Registered Users</h3>
+               </div> 
+               <div class="col-lg-6">
+                   <button class="btn btn-info float-right" @click="showAddModal=true" >
+                       <i class="fa fa-user"></i>&nbsp;&nbsp;Add New User
+                   </button>
+               </div>
+            </div>
+            <hr class="bg-info">
+            <div class="alert alert-danger" v-if="errorMsg">
+               {{errorMsg}}
+            </div>
+            <div class="alert alert-success" v-if="SuccessMsg">
+               {{SuccessMsg}}
+            </div>
+
+
+            <!--Displaying Records-->
+            <div class="row">
+                <div class="col-lg-12">
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                            <tr class="text-center bg-info text-light">
+                                <th>ID</th>
+                                <th>Firstame</th>
+                                <th>Surname</th>
+                                <th>DOB</th>
+                                <th>Age</th>
+                                <th>Height</th>
+                                <th>Hair color</th>
+                                <th>Weight</th>
+                                <th>Edit</th>
+                                <th>Delete</th>
+           
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="text-center" v-for="user in users">
+                                <td>{{ user.id }}</td>
+                                <td>{{ user.firstname }}</td>
+                                <td>{{ user.surname }}</td>
+                                <td>{{ user.dob }}</td>
+                                <td>{{ user.age }}</td>
+                                <td>{{ user.height }}</td>
+                                <td>{{ user.haircolor }}</td>
+                                <td>{{ user.weight }}</td>
+                                <td><a href="#" class="text-success" @click="showEditModal=true; selectUser(user);"><i class="fa fa-edit">
+
+                                </i></a></td>
+                                <td><a href="#" class="text-danger" @click="showDeleteModal=true; selectUser(user);"><i class="fa fa-trash">
+
+                                    </i></a></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+
+       <!--Add new user modal--> 
+       <div id="overlay" v-if="showAddModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add New User</h5>
+                    <button type="button" class="close" @click="showAddModal=false">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body p-4">
+                    <form action="#" method="POST">
+                        <div class="form-group">
+                            <input type="text" name="firstname" 
+                            class="form-control form-control-lg"
+                             placeholder="Firstname" v-model="newUser.firstname"> 
+                        </div>
+
+                        <div class="form-group">
+                                <input type="text" name="surname" 
+                                class="form-control form-control-lg"
+                                 placeholder="Surname"  v-model="newUser.surname"> 
+                            </div>
+
+                            <div class="form-group">
+                                    <input type="date" name="dob" 
+                                    class="form-control form-control-lg"
+                                     placeholder="Date of Birth"  v-model="newUser.dob"> 
+                                </div>
+
+                                <div class="form-group">
+                                        <input type="number" name="number"
+                                        class="form-control form-control-lg"
+                                         placeholder="Age"  v-model="newUser.age"> 
+                                    </div>
+
+                                 <div class="form-group">
+                                           <input type="text" name="height" 
+                                            class="form-control form-control-lg"
+                                             placeholder="Height"  v-model="newUser.height"> 
+                                 </div>
+                                 <div class="form-group">
+                                        <input type="text" name="haircolor" 
+                                        class="form-control form-control-lg"
+                                         placeholder="Hair Colour"  v-model="newUser.haircolor"> 
+                                    </div>
+
+                                    <div class="form-group">
+                                            <input type="text" name="weight" 
+                                            class="form-control form-control-lg"
+                                             placeholder="Weight"  v-model="newUser.weight"> 
+                                        </div>
+
+                                        <div class="form-group">
+                                            <button class="btn btn-info btn-block btn-lng" @click="showAddModal=false; addUser();  clearMsg();">Add User</button>
+                                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+       </div>
+
+              <!--Edit user modal--> 
+              <div id="overlay" v-if="showEditModal">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Edit User</h5>
+                                <button type="button" class="close" @click="showEditModal=false">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body p-4">
+                                <form action="#" method="POST">
+                                    <div class="form-group">
+                                        <input type="text" name="firstname" 
+                                        class="form-control form-control-lg"
+                                        v-model="currentUser.firstname"> 
+                                    </div>
+            
+                                    <div class="form-group">
+                                            <input type="text" name="surname" 
+                                            class="form-control form-control-lg"
+                                            v-model="currentUser.surname"> 
+                                        </div>
+            
+                                        <div class="form-group">
+                                                <input type="date" name="dob" 
+                                                class="form-control form-control-lg"
+                                                v-model="currentUser.dob"> 
+                                            </div>
+            
+                                            <div class="form-group">
+                                                    <input type="number" name="number"
+                                                    class="form-control form-control-lg"
+                                                    v-model="currentUser.age"> 
+                                                </div>
+            
+                                             <div class="form-group">
+                                                       <input type="text" name="height" 
+                                                        class="form-control form-control-lg"
+                                                        v-model="currentUser.height"> 
+                                             </div>
+                                             <div class="form-group">
+                                                    <input type="text" name="haircolor" 
+                                                    class="form-control form-control-lg"
+                                                    v-model="currentUser.haircolor"> 
+                                                </div>
+            
+                                                <div class="form-group">
+                                                        <input type="text" name="weight" 
+                                                        class="form-control form-control-lg"
+                                                        v-model="currentUser.weight"> 
+                                                    </div>
+            
+                                                    <div class="form-group">
+                                                        <button class="btn btn-info btn-block btn-lng" @click="showEditModal=false; updateUser();  clearMsg();">Update User</button>
+                                                    </div>
+            
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                   </div>
+
+
+                   
+              <!--Delete user modal--> 
+              <div id="overlay" v-if="showDeleteModal">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Delete User</h5>
+                                <button type="button" class="close" @click="showDeleteModal=false">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body p-4">
+                              <h4 class="text-danger">Are you sure you want to delete this user?</h4>
+                              <h5>You are deleting '{{ currentUser.firstname }}'</h5>
+                              <hr>
+                              <button class="btn btn-danger btn-lg" @click="showDeleteModal=false;  deleteUser();  clearMsg();">Yes</button>
+                              &nbsp;&nbsp;&nbsp;&nbsp;
+                              <button class="btn btn-success btn-lg" @click="showDeleteModal=false">No</button> 
+                            </div>
+                        </div>
+                    </div>
+                   </div>
+
+
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+    <script src="main.js"></script>
+</body>
+
+
+
+</html>
